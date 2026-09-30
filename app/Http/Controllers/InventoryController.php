@@ -72,6 +72,43 @@ class InventoryController extends Controller
         }
     }
 
+    public function editProduct($id)
+    {
+        $product = Product::findOrFail($id);
+        $search = request('search');
+        $products = Product::when($search, function ($query, $search) {
+            return $query->where('nama_produk', 'like', "%{$search}%")
+                ->orWhere('kode_produk', 'like', "%{$search}%");
+        })->latest()->paginate(10);
+        $transactions = StockTransaction::with('product')->latest()->get();
+
+        return view('inventory.index', compact('product', 'products', 'transactions', 'search'));
+    }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        $request->validate([
+            'kode_produk' => 'required|unique:products,kode_produk,' . $id,
+            'nama_produk' => 'required|string|max:255',
+            'satuan' => 'required|string|max:50',
+            'stok' => 'required|integer|min:0',
+            'harga_satuan' => 'required|numeric|min:0',
+        ]);
+
+        $product->update($request->all());
+
+        return redirect()->to('/')->with('success', 'Produk berhasil diperbarui.');
+    }
+
+    public function destroyProduct($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return redirect()->back()->with('success', 'Produk berhasil dihapus.');
+    }
     // REST API (JSON Response)
 
     public function apiGetProducts(Request $request)
@@ -149,45 +186,5 @@ class InventoryController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
-    }
-    // Tampilkan Form Edit Produk
-    public function editProduct($id)
-    {
-        $product = Product::findOrFail($id);
-        $search = request('search');
-        $products = Product::when($search, function ($query, $search) {
-            return $query->where('nama_produk', 'like', "%{$search}%")
-                ->orWhere('kode_produk', 'like', "%{$search}%");
-        })->latest()->paginate(10);
-        $transactions = StockTransaction::with('product')->latest()->get();
-
-        return view('inventory.index', compact('product', 'products', 'transactions', 'search'));
-    }
-
-    // Update Data Produk
-    public function updateProduct(Request $request, $id)
-    {
-        $product = Product::findOrFail($id);
-
-        $request->validate([
-            'kode_produk' => 'required|unique:products,kode_produk,' . $id,
-            'nama_produk' => 'required|string|max:255',
-            'satuan' => 'required|string|max:50',
-            'stok' => 'required|integer|min:0',
-            'harga_satuan' => 'required|numeric|min:0',
-        ]);
-
-        $product->update($request->all());
-
-        return redirect()->to('/')->with('success', 'Produk berhasil diperbarui.');
-    }
-
-    // Hapus Produk
-    public function destroyProduct($id)
-    {
-        $product = Product::findOrFail($id);
-        $product->delete();
-
-        return redirect()->back()->with('success', 'Produk berhasil dihapus.');
     }
 }
