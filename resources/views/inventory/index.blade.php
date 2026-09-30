@@ -148,6 +148,7 @@
                                     <td><strong>{{ $prod->stok }}</strong></td>
                                     <td>Rp {{ number_format($prod->harga_satuan, 0, ',', '.') }}</td>
                                     <td>
+                                        <a href="{{ route('product.history', $prod->id) }}" class="btn btn-sm btn-info text-white">Histori</a>
                                         <a href="{{ route('product.edit', $prod->id) }}" class="btn btn-sm btn-warning">Edit</a>
                                         <form action="{{ route('product.destroy', $prod->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
                                             @csrf

@@ -20,3 +20,4 @@ Route::get('/produk/{id}/edit', [InventoryController::class, 'editProduct'])->na
 Route::put('/produk/{id}', [InventoryController::class, 'updateProduct'])->name('product.update');
 Route::delete('/produk/{id}', [InventoryController::class, 'destroyProduct'])->name('product.destroy');
 Route::post('/transaksi', [InventoryController::class, 'storeTransaction'])->name('transaction.store');
+Route::get('/produk/{id}/histori', [InventoryController::class, 'productHistory'])->name('product.history');

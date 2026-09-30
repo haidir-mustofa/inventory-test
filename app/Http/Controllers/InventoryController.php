@@ -109,6 +109,12 @@ class InventoryController extends Controller
 
         return redirect()->back()->with('success', 'Produk berhasil dihapus.');
     }
+    public function productHistory($id)
+    {
+        $product = Product::with('transactions')->findOrFail($id);
+
+        return view('inventory.history', compact('product'));
+    }
     // REST API (JSON Response)
 
     public function apiGetProducts(Request $request)
